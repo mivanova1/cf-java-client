@@ -110,7 +110,7 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
                 .flatMapMany(r -> {
                     if (Files.isDirectory(request.getBits())) {
                         return FileUtils.compress(request.getBits())
-                            .then(bits -> upload(bits, r)
+                            .flatMap(bits -> upload(bits, r)
                                 .doOnTerminate((v, t) -> {
                                     try {
                                         Files.delete(bits);

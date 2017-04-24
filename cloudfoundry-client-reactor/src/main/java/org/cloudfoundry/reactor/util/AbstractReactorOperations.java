@@ -58,7 +58,7 @@ public abstract class AbstractReactorOperations {
                                          Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
         return this.root
             .transform(transformUri(uriTransformer))
-            .then(uri -> this.connectionContext.getHttpClient()
+            .flatMap(uri -> this.connectionContext.getHttpClient()
                 .delete(uri, request -> Mono.just(request)
                     .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
@@ -89,13 +89,13 @@ public abstract class AbstractReactorOperations {
                                                    Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
         return this.root
             .transform(transformUri(uriTransformer))
-            .then(uri -> this.connectionContext.getHttpClient()
+            .flatMap(uri -> this.connectionContext.getHttpClient()
                 .get(uri, request -> Mono.just(request)
                     .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
                     .map(UserAgent::addUserAgent)
                     .transform(requestTransformer)
-                    .then(HttpClientRequest::send))
+                    .flatMap(HttpClientRequest::send))
                 .doOnSubscribe(NetworkLogging.get(uri))
                 .transform(NetworkLogging.response(uri)))
             .transform(this::invalidateToken)
@@ -109,7 +109,7 @@ public abstract class AbstractReactorOperations {
                                         Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
         return this.root
             .transform(transformUri(uriTransformer))
-            .then(uri -> this.connectionContext.getHttpClient()
+            .flatMap(uri -> this.connectionContext.getHttpClient()
                 .patch(uri, request -> Mono.just(request)
                     .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
@@ -142,7 +142,7 @@ public abstract class AbstractReactorOperations {
                                        Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
         return this.root
             .transform(transformUri(uriTransformer))
-            .then(uri -> this.connectionContext.getHttpClient()
+            .flatMap(uri -> this.connectionContext.getHttpClient()
                 .post(uri, request -> Mono.just(request)
                     .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
@@ -174,7 +174,7 @@ public abstract class AbstractReactorOperations {
                                       Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
         return this.root
             .transform(transformUri(uriTransformer))
-            .then(uri -> this.connectionContext.getHttpClient()
+            .flatMap(uri -> this.connectionContext.getHttpClient()
                 .put(uri, request -> Mono.just(request)
                     .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
@@ -193,7 +193,7 @@ public abstract class AbstractReactorOperations {
                                                   Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
         return this.root
             .transform(transformUri(uriTransformer))
-            .then(uri -> this.connectionContext.getHttpClient()
+            .flatMap(uri -> this.connectionContext.getHttpClient()
                 .get(uri, request -> Mono.just(request)
                     .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
@@ -233,7 +233,7 @@ public abstract class AbstractReactorOperations {
 
     private Mono<HttpClientResponse> invalidateToken(Mono<HttpClientResponse> inbound) {
         return inbound
-            .then(response -> {
+            .flatMap(response -> {
                 if (response.status() == HttpResponseStatus.UNAUTHORIZED) {
                     this.tokenProvider.invalidate(this.connectionContext);
                     return inbound
