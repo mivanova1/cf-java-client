@@ -51,9 +51,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public final class UsersTest extends AbstractIntegrationTest {
 
     @Autowired
-    private String password;
-
-    @Autowired
     private UaaClient uaaClient;
 
     @Test

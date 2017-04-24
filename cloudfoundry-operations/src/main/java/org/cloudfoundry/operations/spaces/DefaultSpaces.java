@@ -126,8 +126,7 @@ public final class DefaultSpaces implements Spaces {
                         .map(ResourceUtils::getId),
                     Mono.just(username)
                 )))
-            .flatMap(function((cloudFoundryClient, organizationId, spaceId, username) -> requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)
-                .then(Mono.just(Tuples.of(cloudFoundryClient, organizationId, spaceId, username)))))
+            .untilOtherFrom(function((cloudFoundryClient, organizationId, spaceId, username) -> requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)))
             .flatMap(function((cloudFoundryClient, organizationId, spaceId, username) -> Mono
                 .when(
                     requestAssociateSpaceManagerByUsername(cloudFoundryClient, spaceId, username),
